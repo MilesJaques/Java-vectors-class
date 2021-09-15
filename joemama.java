@@ -23,6 +23,11 @@ public class Vector {
         }
         magnitude = Math.sqrt(acc);
     }
+    public Vector(Vector v) {
+        components = v.getComponents();
+        size = v.getSize();
+        magnitude = v.getMagnitude();
+    }
 
     /**
      * Creates a zero vector with specified dimensions.
