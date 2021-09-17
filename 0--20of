@@ -1,0 +1,44 @@
+package PursellJaques;
+
+import com.revrobotics.*;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.AnalogEncoder;
+
+public class SwerveModule {
+    private CANSparkMax angleMotor;
+    private Vector pos; //position of swerveModule relative to center of rotation
+    private CANPIDController speedController;
+    private PIDController angleController;
+    private AnalogEncoder angleEncoder;
+    
+
+    public SwerveModule(int analogIn, Vector pos, CANSparkMax angleMotor, CANSparkMax speedMotor) {
+        // Set up inputs
+        this.pos = pos;
+        this.angleMotor = angleMotor;
+        this.angleEncoder = new AnalogEncoder(new AnalogInput(analogIn));
+
+        //Set up controllers
+        this.speedController = new CANPIDController(speedMotor);
+        speedController.setP(1);
+        speedController.setI(0);
+        speedController.setD(0);
+        this.angleController = new PIDController(1, 0, 0);
+    }
+
+    public void drive(Vector input) {
+        double targetAngle = input.getTheta();
+        double targetVelocity = input.getMagnitude();
+        double angleSpeed = angleController.calculate(angleEncoder.get(), targetAngle);
+        
+        speedController.setReference(targetVelocity, ControlType.kVelocity);
+
+        if (angleSpeed > 1) {angleSpeed = 1.0;}
+        if (angleSpeed < -1) {angleSpeed = -1.0;}
+        angleMotor.set(angleSpeed);
+
+    }
+
+    public Vector getPosition() {return pos;}
+}
